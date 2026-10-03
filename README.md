@@ -1,1 +1,40 @@
-# vit-gesture-classifier 
+# 🤖 경량 Vision Transformer(ViT) 기반 실시간 상태/제스처 분류기
+
+> 로보틱스 비전 파이프라인 및 ROS2 노드 확장을 염두에 둔 5시간 스프린트 프로젝트
+
+---
+
+## 📌 1. 프로젝트 개요
+* **목표**: 사전 학습된 경량 ViT(`vit_tiny_patch16_224`)를 미세조정(Transfer Learning)하여 실시간 객체/제스처 분류기 구현
+* **타겟**: 로봇 제어 명령(Stop / Go / Neutral)과 연동 가능한 비전 입력단 설계
+* **개발 기간**: 5시간 스프린트
+
+---
+
+## 🛠️ 2. 기술 스택
+* **Language**: Python 3.x
+* **Deep Learning**: PyTorch, timm, torchvision
+* **Computer Vision**: OpenCV
+* **VCS**: Git, GitHub
+
+---
+
+## 🧱 3. 파이프라인 구조
+1. **Input**: 웹캠 스트림 영상 캡처
+2. **Preprocess**: 224x224 Resize + ImageNet 정규화
+3. **Backbone**: `timm` vit_tiny_patch16_224 (사전 학습 가중치 Freeze)
+4. **Classifier Head**: Linear Layer 미세조정 (3개 클래스 분류)
+5. **Output**: 실시간 예측 라벨, 신뢰도(Confidence Score), 처리 FPS 표시
+
+---
+
+## 📂 4. 디렉토리 구조 (예정)
+```text
+├── dataset/              # train / val 이미지 폴더 (.gitignore 대상)
+├── weights/              # 학습 완료된 가중치 파일 (.pth)
+├── src/
+│   ├── collect_data.py   # 웹캠 기반 빠른 캡처 수집기
+│   ├── train.py          # ViT 미세조정 학습 스크립트
+│   └── inference.py      # OpenCV 실시간 웹캠 추론기
+├── .gitignore
+└── README.md
