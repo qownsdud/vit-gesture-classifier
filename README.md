@@ -95,3 +95,56 @@
 │   └── inference.py      # OpenCV 실시간 웹캠 추론기
 ├── .gitignore
 └── README.md
+```
+
+2026.10.08.
+
+## 🛡️ 배경 및 조명 노이즈 대응 설계 (Model Robustness)
+
+### 1. 배경 및 문제 정의 (Problem Statement)
+* **초기 데이터셋 한계**: TensorFlow RPS 데이터셋은 균일한 흰색 단색 배경을 기반으로 구성되어 있어, 실제 복잡한 환경(실내 가구, 피부색과 유사한 배경, 그림자)에서 배경 노이즈를 손 특징으로 오인하는 과적합(Overfitting) 취약점이 발생합니다.
+* **목표**: 실제 로봇 작업 환경 및 일상 웹캠 스트림에서도 손 형태에만 집중하여 신뢰도 높은 추론을 유지하도록 모델의 강건성을 확보합니다.
+
+---
+
+### 2. 강건성 개선 아키텍처 및 파이프라인 (Design Overview)
+
+```mermaid
+flowchart LR
+    subgraph Augmentation ["Data Augmentation Pipeline"]
+        A[Original Image] --> B[ColorJitter<br/>밝기/대비/채도 왜곡]
+        B --> C[RandomAffine & Rotation<br/>회전/이동/스케일 변환]
+        C --> D[RandomErasing<br/>일부 영역 랜덤 패치 마스킹]
+    end
+
+    subgraph ViT_Architecture ["ViT Selective Fine-Tuning"]
+        D --> E[Patch Embedding]
+        E --> F[Transformer Blocks 1~11<br/><b>Frozen</b>]
+        F --> G[Transformer Block 12<br/><b>Unfrozen (Fine-Tuning)</b>]
+        G --> H[Classifier Head<br/><b>Unfrozen (Linear Layer)</b>]
+    end
+
+    H --> I[Robust Output Prediction]
+```
+
+---
+
+### 3. 세부 설계 전략 (Key Technical Decisions)
+
+| 구분 | 적용 기법 | 설계 목적 |
+|---|---|---|
+| **조명 적응** | `ColorJitter` (B:0.3, C:0.3, S:0.2, H:0.1) | 실내 조명 색온도 변화, 그림자, 노출 차이에 따른 특징 왜곡 방지 |
+| **자세 적응** | `RandomRotation(±20°)`, `RandomAffine` | 손의 기울기, 웹캠과 손 사이의 거리 변화(스케일링) 대응 |
+| **폐색 및 배경 무시** | `RandomErasing (p=0.4)` | 손의 일부가 잘리거나 가려진 상태(Occlusion)에서도 전역 패치 관계 학습 유도 |
+| **표현력 확장** | ViT 마지막 트랜스포머 블록 언프리즈 (`blocks[-1]`) | 단순 선형 분류기 학습을 넘어 최상위 어텐션 레이어가 실제 손의 공간적 맥락을 재학습하도록 최적화 |
+
+---
+
+### 4. 강건 모델 실행 가이드 (Usage)
+
+강건성 강화 학습 파이프라인 실행:
+```bash
+python src/train_robust.py
+```
+* **출력 가중치**: `weights/vit_gesture_robust.pth`
+* **최적화 옵티마이저**: `AdamW` (Weight Decay: 0.01로 가중치 정규화 적용)
