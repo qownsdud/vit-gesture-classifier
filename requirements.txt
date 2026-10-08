@@ -1,0 +1,7 @@
+torch>=2.0.0 
+torchvision 
+timm 
+opencv-python 
+mediapipe==0.10.14 
+Pillow 
+numpy
