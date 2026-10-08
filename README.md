@@ -68,7 +68,9 @@
 
 ### 4.1 정사각 마진 크롭 알고리즘
 검출된 박스($w, h$)가 직사각형일 경우, ViT 입력($224 \times 224$)으로 왜곡 없이 전달하기 위해 더 긴 변을 기준으로 정사각형 확장 및 20% 여백(Padding)을 적용했습니다:
-$$\text{half\_side} = \lfloor \max(w, h) \times 0.6 \rfloor$$
+
+$$\mathrm{half\_side} = \lfloor \max(w, h) \times 0.6 \rfloor$$
+
 이를 통해 손가락 끝 마디가 잘리지 않고 온전한 제스처 형태가 ViT로 전달되도록 보장했습니다.
 
 ---
