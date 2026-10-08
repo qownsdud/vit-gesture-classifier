@@ -1,4 +1,8 @@
-﻿import os
+﻿# inference_video.py
+
+# 사진이 아닌 동영상 인식해보기
+
+import os
 import time
 import cv2
 import numpy as np

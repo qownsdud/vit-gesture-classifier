@@ -1,5 +1,8 @@
 # compare_models.py
 
+# 일반 train 모델인 train.py와 강건한 train 모델인 train_robust.py의 성능을
+# 트럼프 사진을 분석한 결과로 비교해보기
+
 import os
 import sys
 import torch
@@ -18,7 +21,7 @@ def get_model(weights_path):
     return model
 
 def main():
-    img_path = 'my_hand.jpg'
+    img_path = 'tests\my_hand.jpg'
     if not os.path.exists(img_path):
         print(f"오류: {img_path} 파일이 없습니다! 프로젝트 폴더에 실제 손 사진(my_hand.jpg)을 넣어주세요.")
         return

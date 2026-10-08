@@ -1,5 +1,7 @@
 ﻿# inference_mediapipe.py
 
+# ViT가 아닌 MediaPipe를 활용하여 동영상 인식해보기
+
 import os
 import time
 import cv2

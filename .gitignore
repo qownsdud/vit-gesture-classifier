@@ -1,3 +1,7 @@
 __pycache__/ 
 *.pth 
 dataset/ 
+ 
+*.pt 
+weights/*.pth 
+dataset/ 
